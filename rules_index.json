@@ -13,7 +13,7 @@
         "gitcode_raw_js": "https://gitcode.com/qq_51887218/PlanCraftDownload/raw/main/class/gdlyzyjsxy.js"
       },
       "webview_config": {
-        "login_url": "http://jwc.gdlyzyjsxy.edu.cn/login.aspx",
+        "login_url": "https://sso.lnc.edu.cn/lyuapServer/login?service=https://newjw.lnc.edu.cn/caslogin",
         "schedule_url_pattern": "http://jwc.gdlyzyjsxy.edu.cn/schedule",
         "encoding": "GBK",
         "wait_for_element": "#schedule-table",
