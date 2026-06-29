@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "last_updated": "2026-06-29",
+  "schools": [
+    {
+      "id": "gdlyzyjsxy",
+      "name": "广东岭南职业技术学院",
+      "aliases": ["岭南学院", "广东岭南"],
+      "system": "正方V8.0",
+      "version": "2026.06.28",
+      "urls": {
+        "github_raw_js": "https://github.com/cjz-wr/PlanCraftDownload/blob/main/class/gdlyzyjsxy.js",
+        "gitcode_raw_js": "https://gitcode.com/qq_51887218/PlanCraftDownload/raw/main/class/gdlyzyjsxy.js"
+      },
+      "webview_config": {
+        "login_url": "http://jwc.gdlyzyjsxy.edu.cn/login.aspx",
+        "schedule_url_pattern": "http://jwc.gdlyzyjsxy.edu.cn/schedule",
+        "encoding": "GBK",
+        "wait_for_element": "#schedule-table",
+        "js_timeout": 10000
+      }
+    }
+  ]
+}
