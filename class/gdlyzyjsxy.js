@@ -1,15 +1,42 @@
 // ============================================================
-// WebView 专用简化版 extractSchedule（无 console.log，无 Promise）
+// 增强版 extractSchedule（自动探测 iframe，无 console.log，无 Promise）
 // ============================================================
 function extractSchedule() {
     var result = [];
-    
+
     try {
-        var table = document.querySelector('#mytable0');
-        if (!table) return JSON.stringify({ error: 'TABLE_NOT_FOUND' });
-        
-        var cells = table.querySelectorAll('td.td, td.td0');
+        // ----- 1. 自动查找包含 #mytable0 的文档 -----
+        var doc = document;
+        var table = doc.querySelector('#mytable0');
+
+        // 如果主文档没有，则遍历所有 iframe/frame
+        if (!table) {
+            var frames = doc.querySelectorAll('iframe, frame');
+            for (var i = 0; i < frames.length; i++) {
+                try {
+                    var frameDoc = frames[i].contentDocument || frames[i].contentWindow.document;
+                    if (frameDoc) {
+                        table = frameDoc.querySelector('#mytable0');
+                        if (table) {
+                            doc = frameDoc;   // 切换到 iframe 的文档
+                            break;
+                        }
+                    }
+                } catch(e) {
+                    // 跨域或访问被拒，忽略
+                }
+            }
+        }
+
+        if (!table) {
+            return JSON.stringify({ error: 'TABLE_NOT_FOUND' });
+        }
+
+        // ----- 2. 使用找到的文档 doc 进行后续操作 -----
+        var cells = doc.querySelectorAll('td.td, td.td0');
         var processedIds = {};
+
+        // 节次 -> 时间映射（保持不变）
         var PERIOD_TIME_MAP = {
             '1-2节': { start: '08:00', end: '09:40' },
             '3-4节': { start: '10:00', end: '11:40' },
@@ -33,11 +60,11 @@ function extractSchedule() {
             '5-8节': { start: '14:00', end: '17:40' },
             '9-12节': { start: '19:00', end: '22:30' }
         };
-        
+
         function clean(str) {
             return str ? str.replace(/\s+/g, ' ').trim() : '';
         }
-        
+
         function extractCourseName(text) {
             var firstSpace = text.indexOf(' ');
             var name = firstSpace > 0 ? text.substring(0, firstSpace) : text;
@@ -45,43 +72,43 @@ function extractSchedule() {
             if (bracketMatch) name = bracketMatch[1] + '（' + bracketMatch[2] + '）';
             return name;
         }
-        
+
         cells.forEach(function(cell) {
             var div = cell.querySelector('div[id]');
             if (!div) return;
-            
+
             var id = div.id;
             if (!id || id.length < 2) return;
-            
+
             var colChar = id.charAt(1);
             var colIndex = parseInt(colChar);
             if (isNaN(colIndex) || colIndex < 1 || colIndex > 7) return;
-            
+
             var dayMap = { 1: 1, 2: 2, 3: 3, 4: 4, 5: 5, 6: 6, 7: 7 };
             var day = dayMap[colIndex];
             if (!day) return;
-            
+
             if (processedIds[id]) return;
             processedIds[id] = true;
-            
+
             var title = cell.getAttribute('title');
             if (!title || !title.trim()) return;
-            
+
             var parts = title.split('\n').filter(function(s) { return s.trim(); });
             if (parts.length === 0) parts = title.split(/<br\s*\/?>/i).filter(function(s) { return s.trim(); });
             if (parts.length === 0) parts = [clean(title)];
-            
+
             parts.forEach(function(part) {
                 var cleanPart = clean(part);
                 if (!cleanPart) return;
-                
+
                 var weekMatch = cleanPart.match(/\[([^\]]+)\]\s*周/);
                 var weeks = weekMatch ? weekMatch[1] : '1-16';
-                
+
                 var periodMatch = cleanPart.match(/(\d+-\d+节|\d+节)/);
                 var periodKey = periodMatch ? periodMatch[1] : '1-2节';
                 var timeInfo = PERIOD_TIME_MAP[periodKey] || { start: '08:00', end: '09:40' };
-                
+
                 var location = '';
                 var locMatch = cleanPart.match(/\d+-\d+节\s+([^\s]+(?:\s+[^\s]+)*?)\s+[^\s]+校区/);
                 if (locMatch) location = locMatch[1].trim();
@@ -89,7 +116,7 @@ function extractSchedule() {
                     var onlineMatch = cleanPart.match(/线上教室\d+/);
                     if (onlineMatch) location = onlineMatch[0];
                 }
-                
+
                 var name = extractCourseName(cleanPart);
                 if (name && name.length > 1) {
                     result.push({
@@ -103,13 +130,30 @@ function extractSchedule() {
                 }
             });
         });
-        
+
         return JSON.stringify({ success: true, data: result, count: result.length });
-        
+
     } catch(e) {
         return JSON.stringify({ success: false, error: e.message });
     }
 }
 
-// 直接返回 JSON 字符串（WebView 的 evaluateJavascript 只能接收返回值）
-extractSchedule();
+// ============================================================
+// 执行并输出结果（用于直接运行或注入）
+// ============================================================
+(function() {
+    try {
+        var result = extractSchedule();
+        // 如果结果是字符串（JSON），直接输出
+        if (typeof result === 'string') {
+            console.log(result);
+            return result;
+        }
+        // 否则转为JSON字符串
+        console.log(JSON.stringify(result));
+        return JSON.stringify(result);
+    } catch(e) {
+        console.error('执行失败:', e.message);
+        return JSON.stringify({ success: false, error: e.message });
+    }
+})();
