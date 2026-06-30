@@ -10,7 +10,7 @@
       "version": "2026.06.28",
       "urls": {
         "github_raw_js": "https://raw.githubusercontent.com/cjz-wr/PlanCraftDownload/refs/heads/main/class/gdlyzyjsxy.js",
-        "gitcode_raw_js": "https://gitcode.com/qq_51887218/PlanCraftDownload/raw/main/class/gdlyzyjsxy.js"
+        "gitcode_raw_js": "https://raw.gitcode.com/qq_51887218/PlanCraftDownload/raw/main/class/gdlyzyjsxy.js"
       },
       "webview_config": {
         "login_url": "https://sso.lnc.edu.cn/lyuapServer/login?service=https://newjw.lnc.edu.cn/caslogin",
