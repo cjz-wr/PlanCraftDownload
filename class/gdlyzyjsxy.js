@@ -1,11 +1,11 @@
 // ============================================================
-// 增强版 extractSchedule（递归穿透 iframe + 周段独立拆分）
+// 增强版 extractSchedule（修复地点提取 + 递归iframe + 周段拆分）
 // ============================================================
 function extractSchedule() {
     var result = [];
 
     try {
-        // ----- 1. 递归查找包含 #mytable0 的文档（支持任意层嵌套） -----
+        // ----- 1. 递归查找包含 #mytable0 的文档 -----
         function findTableRecursive(rootDoc) {
             var visited = new WeakSet();
             function search(doc) {
@@ -21,9 +21,7 @@ function extractSchedule() {
                             var found = search(frameDoc);
                             if (found) return found;
                         }
-                    } catch(e) {
-                        // 跨域或无权访问，跳过该 iframe
-                    }
+                    } catch(e) { /* 跨域忽略 */ }
                 }
                 return null;
             }
@@ -37,7 +35,7 @@ function extractSchedule() {
         var doc = found.doc;
         var table = found.table;
 
-        // ----- 2. 基于找到的文档进行解析 -----
+        // ----- 2. 解析课表 -----
         var cells = doc.querySelectorAll('td.td, td.td0');
         var processedIds = {};
 
@@ -106,21 +104,20 @@ function extractSchedule() {
                 var cleanPart = clean(part);
                 if (!cleanPart) return;
 
-                // ===== 提取所有原始周段，再按逗号拆分为独立子段 =====
+                // --- 周次处理（拆分逗号分隔的周段） ---
                 var rawSegments = [];
                 var weekRe = /\[([^\]]*)\]周|(\d+)周/g;
                 var m;
                 while ((m = weekRe.exec(cleanPart)) !== null) {
                     if (m[1] !== undefined) {
-                        rawSegments.push(m[1]);  // 方括号内可能含逗号，如 "1-8,10-15,17"
+                        rawSegments.push(m[1]);
                     } else if (m[2] !== undefined) {
                         rawSegments.push(m[2]);
                     }
                 }
                 var weekSegments = [];
                 for (var si = 0; si < rawSegments.length; si++) {
-                    var segStr = rawSegments[si];
-                    var subSegs = segStr.split(',');
+                    var subSegs = rawSegments[si].split(',');
                     for (var sj = 0; sj < subSegs.length; sj++) {
                         var sub = subSegs[sj].trim();
                         if (sub) weekSegments.push(sub);
@@ -130,18 +127,27 @@ function extractSchedule() {
                     weekSegments.push('1-16');
                 }
 
+                // --- 节次 ---
                 var periodMatch = cleanPart.match(/(\d+-\d+节|\d+节)/);
                 var periodKey = periodMatch ? periodMatch[1] : '1-2节';
                 var timeInfo = PERIOD_TIME_MAP[periodKey] || { start: '08:00', end: '09:40' };
 
+                // --- 地点（修复班级干扰） ---
                 var location = '';
-                var locMatch = cleanPart.match(/\d+-\d+节\s+([^\s]+(?:\s+[^\s]+)*?)\s+[^\s]+校区/);
-                if (locMatch) location = locMatch[1].trim();
+                var locSectionMatch = cleanPart.match(/(\d+-\d+节|\d+节)\s+(.+?)\s+[^\s]+校区/);
+                if (locSectionMatch) {
+                    var locPart = locSectionMatch[2];
+                    // 去掉可能存在的班级信息（如 "5班"）
+                    locPart = locPart.replace(/\d+班\s*/g, '').trim();
+                    if (locPart) location = locPart;
+                }
+                // 如果仍未找到，检查线上教室（通常不带校区字样时使用）
                 if (!location) {
                     var onlineMatch = cleanPart.match(/线上教室\d+/);
                     if (onlineMatch) location = onlineMatch[0];
                 }
 
+                // --- 课程名 ---
                 var name = extractCourseName(cleanPart);
                 if (name && name.length > 1) {
                     // 每个独立周段生成一条记录
