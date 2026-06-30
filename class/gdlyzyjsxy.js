@@ -1,36 +1,41 @@
 // ============================================================
-// 增强版 extractSchedule（自动探测 iframe，无 console.log，无 Promise）
+// 增强版 extractSchedule（支持任意层 iframe 嵌套，无 console.log，无 Promise）
 // ============================================================
 function extractSchedule() {
     var result = [];
 
     try {
-        // ----- 1. 自动查找包含 #mytable0 的文档 -----
-        var doc = document;
-        var table = doc.querySelector('#mytable0');
-
-        // 如果主文档没有，则遍历所有 iframe/frame
-        if (!table) {
-            var frames = doc.querySelectorAll('iframe, frame');
-            for (var i = 0; i < frames.length; i++) {
-                try {
-                    var frameDoc = frames[i].contentDocument || frames[i].contentWindow.document;
-                    if (frameDoc) {
-                        table = frameDoc.querySelector('#mytable0');
-                        if (table) {
-                            doc = frameDoc;   // 切换到 iframe 的文档
-                            break;
+        // ----- 1. 递归查找包含 #mytable0 的文档 -----
+        function findTableRecursive(rootDoc) {
+            var visited = new WeakSet();
+            function search(doc) {
+                if (!doc || visited.has(doc)) return null;
+                visited.add(doc);
+                var table = doc.querySelector('#mytable0');
+                if (table) return { table: table, doc: doc };
+                var frames = doc.querySelectorAll('iframe, frame');
+                for (var i = 0; i < frames.length; i++) {
+                    try {
+                        var frameDoc = frames[i].contentDocument || frames[i].contentWindow.document;
+                        if (frameDoc) {
+                            var found = search(frameDoc);
+                            if (found) return found;
                         }
+                    } catch(e) {
+                        // 跨域或访问被拒，忽略该 iframe
                     }
-                } catch(e) {
-                    // 跨域或访问被拒，忽略
                 }
+                return null;
             }
+            return search(rootDoc);
         }
 
-        if (!table) {
+        var found = findTableRecursive(document);
+        if (!found) {
             return JSON.stringify({ error: 'TABLE_NOT_FOUND' });
         }
+        var doc = found.doc;
+        var table = found.table;
 
         // ----- 2. 使用找到的文档 doc 进行后续操作 -----
         var cells = doc.querySelectorAll('td.td, td.td0');
@@ -144,14 +149,8 @@ function extractSchedule() {
 (function() {
     try {
         var result = extractSchedule();
-        // 如果结果是字符串（JSON），直接输出
-        if (typeof result === 'string') {
-            console.log(result);
-            return result;
-        }
-        // 否则转为JSON字符串
-        console.log(JSON.stringify(result));
-        return JSON.stringify(result);
+        console.log(result);
+        return result;
     } catch(e) {
         console.error('执行失败:', e.message);
         return JSON.stringify({ success: false, error: e.message });
