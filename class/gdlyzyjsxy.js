@@ -1,11 +1,11 @@
 // ============================================================
-// 增强版 extractSchedule（支持任意层 iframe 嵌套，无 console.log，无 Promise）
+// 增强版 extractSchedule（递归穿透 iframe + 周段独立拆分）
 // ============================================================
 function extractSchedule() {
     var result = [];
 
     try {
-        // ----- 1. 递归查找包含 #mytable0 的文档 -----
+        // ----- 1. 递归查找包含 #mytable0 的文档（支持任意层嵌套） -----
         function findTableRecursive(rootDoc) {
             var visited = new WeakSet();
             function search(doc) {
@@ -22,7 +22,7 @@ function extractSchedule() {
                             if (found) return found;
                         }
                     } catch(e) {
-                        // 跨域或访问被拒，忽略该 iframe
+                        // 跨域或无权访问，跳过该 iframe
                     }
                 }
                 return null;
@@ -37,11 +37,10 @@ function extractSchedule() {
         var doc = found.doc;
         var table = found.table;
 
-        // ----- 2. 使用找到的文档 doc 进行后续操作 -----
+        // ----- 2. 基于找到的文档进行解析 -----
         var cells = doc.querySelectorAll('td.td, td.td0');
         var processedIds = {};
 
-        // 节次 -> 时间映射（保持不变）
         var PERIOD_TIME_MAP = {
             '1-2节': { start: '08:00', end: '09:40' },
             '3-4节': { start: '10:00', end: '11:40' },
@@ -107,8 +106,29 @@ function extractSchedule() {
                 var cleanPart = clean(part);
                 if (!cleanPart) return;
 
-                var weekMatch = cleanPart.match(/\[([^\]]+)\]\s*周/);
-                var weeks = weekMatch ? weekMatch[1] : '1-16';
+                // ===== 提取所有原始周段，再按逗号拆分为独立子段 =====
+                var rawSegments = [];
+                var weekRe = /\[([^\]]*)\]周|(\d+)周/g;
+                var m;
+                while ((m = weekRe.exec(cleanPart)) !== null) {
+                    if (m[1] !== undefined) {
+                        rawSegments.push(m[1]);  // 方括号内可能含逗号，如 "1-8,10-15,17"
+                    } else if (m[2] !== undefined) {
+                        rawSegments.push(m[2]);
+                    }
+                }
+                var weekSegments = [];
+                for (var si = 0; si < rawSegments.length; si++) {
+                    var segStr = rawSegments[si];
+                    var subSegs = segStr.split(',');
+                    for (var sj = 0; sj < subSegs.length; sj++) {
+                        var sub = subSegs[sj].trim();
+                        if (sub) weekSegments.push(sub);
+                    }
+                }
+                if (weekSegments.length === 0) {
+                    weekSegments.push('1-16');
+                }
 
                 var periodMatch = cleanPart.match(/(\d+-\d+节|\d+节)/);
                 var periodKey = periodMatch ? periodMatch[1] : '1-2节';
@@ -124,14 +144,17 @@ function extractSchedule() {
 
                 var name = extractCourseName(cleanPart);
                 if (name && name.length > 1) {
-                    result.push({
-                        name: name,
-                        day: day,
-                        startTime: timeInfo.start,
-                        endTime: timeInfo.end,
-                        location: location || '',
-                        weeks: weeks
-                    });
+                    // 每个独立周段生成一条记录
+                    for (var wk = 0; wk < weekSegments.length; wk++) {
+                        result.push({
+                            name: name,
+                            day: day,
+                            startTime: timeInfo.start,
+                            endTime: timeInfo.end,
+                            location: location || '',
+                            weeks: weekSegments[wk]
+                        });
+                    }
                 }
             });
         });
@@ -144,7 +167,7 @@ function extractSchedule() {
 }
 
 // ============================================================
-// 执行并输出结果（用于直接运行或注入）
+// 执行入口
 // ============================================================
 (function() {
     try {
