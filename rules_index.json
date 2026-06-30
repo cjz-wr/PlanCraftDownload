@@ -1,13 +1,13 @@
 {
   "version": 1,
-  "last_updated": "2026-06-29",
+  "last_updated": "2026-06-30",
   "schools": [
     {
       "id": "gdlyzyjsxy",
       "name": "广东岭南职业技术学院",
       "aliases": ["岭南学院", "广东岭南"],
       "system": "青果",
-      "version": "2026.06.28",
+      "version": "2026.06.30",
       "urls": {
         "github_raw_js": "https://raw.githubusercontent.com/cjz-wr/PlanCraftDownload/refs/heads/main/class/gdlyzyjsxy.js",
         "gitcode_raw_js": "https://raw.gitcode.com/qq_51887218/PlanCraftDownload/raw/main/class/gdlyzyjsxy.js"
