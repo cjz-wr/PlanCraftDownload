@@ -9,7 +9,7 @@
       "system": "正方V8.0",
       "version": "2026.06.28",
       "urls": {
-        "github_raw_js": "https://github.com/cjz-wr/PlanCraftDownload/blob/main/class/gdlyzyjsxy.js",
+        "github_raw_js": "https://raw.githubusercontent.com/cjz-wr/PlanCraftDownload/refs/heads/main/class/gdlyzyjsxy.js",
         "gitcode_raw_js": "https://gitcode.com/qq_51887218/PlanCraftDownload/raw/main/class/gdlyzyjsxy.js"
       },
       "webview_config": {
