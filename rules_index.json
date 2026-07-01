@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "last_updated": "2026-06-30",
+  "last_updated": "2026-07-01",
   "schools": [
     {
       "id": "gdlyzyjsxy",
@@ -16,6 +16,24 @@
         "login_url": "https://sso.lnc.edu.cn/lyuapServer/login?service=https://newjw.lnc.edu.cn/caslogin",
         "schedule_url_pattern": "http://jwc.gdlyzyjsxy.edu.cn/schedule",
         "encoding": "GBK",
+        "wait_for_element": "#schedule-table",
+        "js_timeout": 10000
+      }
+    },
+    {
+      "id": "gzhualixy",
+      "name": "广州华立学院",
+      "aliases": ["华立学院", "广东工业大学华立学院"],
+      "system": "正方",
+      "version": "2026.07.01",
+      "urls": {
+        "github_raw_js": "https://raw.githubusercontent.com/cjz-wr/PlanCraftDownload/refs/heads/main/class/gzhualixy.js",
+        "gitcode_raw_js": "https://raw.gitcode.com/qq_51887218/PlanCraftDownload/raw/main/class/gzhualixy.js"
+      },
+      "webview_config": {
+        "login_url": "https://www.hltz.net/hlxy_jsxsd/",
+        "schedule_url_pattern": "https://www.hltz.net/hlxy_jsxsd/**",
+        "encoding": "UTF-8",
         "wait_for_element": "#schedule-table",
         "js_timeout": 10000
       }
