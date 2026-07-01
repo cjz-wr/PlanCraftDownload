@@ -24,17 +24,17 @@
       "id": "gzhualixy",
       "name": "广州华立学院",
       "aliases": ["华立学院", "广东工业大学华立学院"],
-      "system": "正方",
+      "system": "强智",
       "version": "2026.07.01",
       "urls": {
-        "github_raw_js": "https://raw.githubusercontent.com/cjz-wr/PlanCraftDownload/refs/heads/main/class/gzhualixy.js",
-        "gitcode_raw_js": "https://raw.gitcode.com/qq_51887218/PlanCraftDownload/raw/main/class/gzhualixy.js"
+        "github_raw_js": "https://raw.githubusercontent.com/cjz-wr/PlanCraftDownload/refs/heads/main/class/gzhualixy_qt.js",
+        "gitcode_raw_js": "https://raw.gitcode.com/qq_51887218/PlanCraftDownload/raw/main/class/gzhualixy_qt.js"
       },
       "webview_config": {
         "login_url": "https://www.hltz.net/hlxy_jsxsd/",
         "schedule_url_pattern": "https://www.hltz.net/hlxy_jsxsd/**",
-        "encoding": "UTF-8",
-        "wait_for_element": "#schedule-table",
+        "encoding": "GBK",
+        "wait_for_element": "#wdkbTable",
         "js_timeout": 10000
       }
     }
