@@ -4,7 +4,7 @@
 > 更新前，请务必通过 **「更多 → 数据导出」** 将任务、打卡记录等备份到本地。  
 > 数据无价，提前备份，安心迎接新版本！
 
-![](https://picsum.photos/seed/banner2026/800/200)
+![](https://github.com/cjz-wr/PlanCraftDownload/blob/main/0e52740f-2e20-4caf-9bd1-59001443c72a.png?raw=true)
 
 ## 功能预告
 >我们将在新版本中添加ai自动创建任务的功能，这样你将可以快速的创建你的学习计划等计划，不过需要注意的是，ai需要你来自行配置哦
