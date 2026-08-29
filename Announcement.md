@@ -7,7 +7,7 @@
 ![](https://raw.githubusercontent.com/cjz-wr/PlanCraftDownload/main/0e52740f-2e20-4caf-9bd1-59001443c72a.png)
 
 ## 更新内容
-- 竖屏平板横屏
+- 支持平板横屏
 - 设置界面的全局搜索支持批量删除
 
 > “备份好过去，未来才安心如约。”  
