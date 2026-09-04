@@ -1,7 +1,4 @@
-<p align="center">
-  <img src="app/src/main/res/mipmap-xxhdpi/ic_launcher.png" width="120" height="120" alt="PlanCraft">
-</p>
-
+![a](0e52740f-2e20-4caf-9bd1-59001443c72a.png)
 <h1 align="center">📅 PlanCraft</h1>
 
 <p align="center">
