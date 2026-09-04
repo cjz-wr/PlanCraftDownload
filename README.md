@@ -20,6 +20,13 @@
 它没有复杂的订阅，**所有数据保存在本地**，AI 能力由您自己的 API Key 驱动，并设有**全局隐私开关**，让您完全掌控自己的数据。  
 更有**多平台云端同步**（GitHub / Gitee / GitCode）支持，让多设备协同轻松无忧。
 
+>[!warning]
+>目前该APP仅支持安卓版本，如果你是苹果设备请访问下面链接来添加课表
+>
+>[PlanCraftWebIOS](https://cjz-wr.github.io/PlanCraftWebIOS/)
+>
+>[该项目的仓库](https://github.com/cjz-wr/PlanCraftWebIOS)
+
 ---
 
 ## ✨ 核心亮点
